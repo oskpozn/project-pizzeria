@@ -58,6 +58,7 @@
       thisProduct.data = data;
       thisProduct.renderInMenu();
       thisProduct.initAccordion();
+      thisProduct.getElements();
       console.log('new Product: ',thisProduct);
     }
     renderInMenu(){
@@ -76,18 +77,19 @@
       /* find the clickable trigger (the element that should react to clicking) */
       const clickables = thisProduct.element;
       /* START: click event listener to trigger */
-      clickables.addEventListener('click', function(){
+      clickables.addEventListener("click", function(){
         console.log();
         /* prevent default action for event */
         event.preventDefault();
         /* toggle active class on element of thisProduct */
-        thisProduct.element.classList.toggle(select.menuProduct.clickable);
+        thisProduct.element.classList.toggle('active');
         /* find all active products */
         const activeProducts = document.querySelectorAll(select.menuProduct.clickable);
         /* START LOOP: for each active product */
         for (let activeProduct of activeProducts) {
+          console.log('activeProduct: ', activeProduct)
         /* START: if the active product isn't the element of thisProduct */
-          if (activeProduct == clickables) {
+          if (activeProduct !== clickables) {
           /* remove class active for the active product */
             thisProduct.element.classList.remove(select.menuProduct.clickable);
           } else {
@@ -96,7 +98,17 @@
           /* END LOOP: for each active product */
         }
         /* END: click event listener to trigger */
+        console.log(thisProduct.element)
       });
+    }
+    getElements(){
+      const thisProduct = this;
+
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
+      thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
+      thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
+      thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
     }
   }
   const app = {
