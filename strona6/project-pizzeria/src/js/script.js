@@ -75,9 +75,10 @@
     initAccordion() {
       const thisProduct = this;
       /* find the clickable trigger (the element that should react to clicking) */
-      const clickables = thisProduct.element;
+      const clickables = thisProduct.element.querySelector(select.menuProduct.clickable);
+      console.log('thisProduct.element: ',thisProduct);
       /* START: click event listener to trigger */
-      clickables.addEventListener("click", function(){
+      clickables.addEventListener('click', function(){
         console.log();
         /* prevent default action for event */
         event.preventDefault();
@@ -87,8 +88,8 @@
         const activeProducts = document.querySelectorAll(select.menuProduct.clickable);
         /* START LOOP: for each active product */
         for (let activeProduct of activeProducts) {
-          console.log('activeProduct: ', activeProduct)
-        /* START: if the active product isn't the element of thisProduct */
+          console.log('activeProduct: ', activeProduct);
+          /* START: if the active product isn't the element of thisProduct */
           if (activeProduct !== clickables) {
           /* remove class active for the active product */
             thisProduct.element.classList.remove(select.menuProduct.clickable);
@@ -98,7 +99,7 @@
           /* END LOOP: for each active product */
         }
         /* END: click event listener to trigger */
-        console.log(thisProduct.element)
+        //console.log(thisProduct.element);
       });
     }
     getElements(){
