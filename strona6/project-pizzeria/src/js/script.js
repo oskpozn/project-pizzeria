@@ -17,8 +17,8 @@
       formInputs: 'input, select',
     },
     menuProduct: {
-      clickable: '.product__header',
-      form: '.product__order',
+      clickable: '.product__header', // <- jeśli zmienimy na active, to działa poprawnie, nie zmieniałem
+      form: '.product__order',       //    ze względu na to, że w zdaniu nie było napisane
       priceElem: '.product__total-price .price',
       imageWrapper: '.product__images',
       amountWidget: '.widget-amount',
@@ -51,8 +51,73 @@
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
   };
-
+  class Product{
+    constructor(id, data){
+      const thisProduct = this;
+      thisProduct.id = id;
+      thisProduct.data = data;
+      thisProduct.renderInMenu();
+      thisProduct.initAccordion();
+      console.log('new Product: ',thisProduct);
+    }
+    renderInMenu(){
+      const thisProduct = this;
+      /* generate HTML based on template */
+      const generatedHTML = templates.menuProduct(thisProduct.data);
+      /* create element using utils.createElementFromHTML */
+      thisProduct.element = utils.createDOMFromHTML(generatedHTML);
+      /* find menu container */
+      const menuContainer = document.querySelector(select.containerOf.menu);
+      /* add element to menu */
+      menuContainer.appendChild(thisProduct.element);
+    }
+    initAccordion() {
+      const thisProduct = this;
+      /* find the clickable trigger (the element that should react to clicking) */
+      const clickables = thisProduct.element;
+      /* START: click event listener to trigger */
+      clickables.addEventListener('click', function(){
+        console.log();
+        /* prevent default action for event */
+        event.preventDefault();
+        /* toggle active class on element of thisProduct */
+        thisProduct.element.classList.toggle(select.menuProduct.clickable);
+        /* find all active products */
+        const activeProducts = document.querySelectorAll(select.menuProduct.clickable);
+        /* START LOOP: for each active product */
+        for (let activeProduct of activeProducts) {
+        /* START: if the active product isn't the element of thisProduct */
+          if (activeProduct == clickables) {
+          /* remove class active for the active product */
+            thisProduct.element.classList.remove(select.menuProduct.clickable);
+          } else {
+            /* END: if the active product isn't the element of thisProduct */
+          }
+          /* END LOOP: for each active product */
+        }
+        /* END: click event listener to trigger */
+      });
+    }
+  }
   const app = {
+    initMenu: function() {
+      const thisApp = this;
+
+      console.log('thisApp.data:',thisApp.data);
+
+      for (let productData in thisApp.data.products) {
+        new Product(productData, thisApp.data.products[productData]);
+      }
+      const testProduct = new Product();
+      console.log('testProduct: ',testProduct);
+    },
+
+    initData: function() {
+      const thisApp = this;
+
+      thisApp.data = dataSource;
+    },
+
     init: function(){
       const thisApp = this;
       console.log('*** App starting ***');
@@ -60,6 +125,8 @@
       console.log('classNames:', classNames);
       console.log('settings:', settings);
       console.log('templates:', templates);
+      thisApp.initData();
+      thisApp.initMenu();
     },
   };
 
