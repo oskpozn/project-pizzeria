@@ -78,30 +78,26 @@
       const thisProduct = this;
       /* find the clickable trigger (the element that should react to clicking) */
       const clickables = thisProduct.element.querySelector(select.menuProduct.clickable);
-      //console.log('thisProduct.element: ',thisProduct);
       /* START: click event listener to trigger */
       clickables.addEventListener('click', function(){
-        //console.log();
         /* prevent default action for event */
         event.preventDefault();
         /* toggle active class on element of thisProduct */
         thisProduct.element.classList.toggle('active');
         /* find all active products */
-        const activeProducts = document.querySelectorAll(select.menuProduct.clickable);
+        const activeProducts = document.querySelectorAll(select.all.menuProductsActive);
         /* START LOOP: for each active product */
         for (let activeProduct of activeProducts) {
-          //console.log('activeProduct: ', activeProduct);
           /* START: if the active product isn't the element of thisProduct */
-          if (activeProduct !== clickables) {
+          if (activeProduct !== thisProduct.element) {
           /* remove class active for the active product */
-            thisProduct.element.classList.remove(select.menuProduct.clickable);
+            activeProduct.classList.remove('active');
           } else {
             /* END: if the active product isn't the element of thisProduct */
           }
           /* END LOOP: for each active product */
         }
         /* END: click event listener to trigger */
-        //console.log(thisProduct.element);
       });
     }
     initOrderForm() {
@@ -124,11 +120,37 @@
     }
     processOrder() {
       const thisProduct = this;
+      /* read all data from the form (using utils.serializeFormToObject) and save it to const formData */
       const formData = utils.serializeFormToObject(thisProduct.form);
-      console.log( 'formData :', formData);
-      let price;
-      const params =
-      price = thisProduct.priceElem;
+      /* set variable price to equal thisProduct.data.price */
+      let price = thisProduct.data.price;
+      /* START LOOP: for each paramId in thisProduct.data.params */
+      for (const paramId in thisProduct.data.params) {
+        /* save the element in thisProduct.data.params with key paramId as const param */
+        const param = thisProduct.data.params[paramId];
+        /* START LOOP: for each optionId in param.options */
+        for (const optionId in param.options) {
+          /* save the element in param.options with key optionId as const option */
+          const option = param.options[optionId];
+          const optionSelected = formData.hasOwnProperty(paramId) && formData[paramId].indexOf(optionId) > -1;
+          /* START IF: if option is selected and option is not default */
+          if(optionSelected && !option.default){
+            /* add price of option to variable price */
+            price = price + option.price;
+            /* END IF: if option is selected and option is not default */
+          }
+          /* START ELSE IF: if option is not selected and option is default */
+          else if (!optionSelected && option.default) {
+          /* deduct price of option from price */
+            price = price - option.price;
+          }
+          /* END ELSE IF: if option is not selected and option is default */
+        }
+        /* END LOOP: for each optionId in param.options */
+      }
+      /* END LOOP: for each paramId in thisProduct.data.params */
+      /* set the contents of thisProduct.priceElem to be the value of variable price */
+      thisProduct.priceElem.innerHTML = price;
     }
     getElements() {
       const thisProduct = this;
@@ -149,8 +171,8 @@
       for (let productData in thisApp.data.products) {
         new Product(productData, thisApp.data.products[productData]);
       }
-      const testProduct = new Product();
-      console.log('testProduct: ',testProduct);
+      //const testProduct = new Product();
+      //console.log('testProduct: ',testProduct);
     },
 
     initData: function() {
