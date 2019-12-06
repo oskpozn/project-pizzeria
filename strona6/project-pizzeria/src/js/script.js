@@ -59,6 +59,7 @@
       thisProduct.renderInMenu();
       thisProduct.getElements();
       thisProduct.initOrderForm();
+      thisProduct.initAmountWidget();
       thisProduct.processOrder();
       thisProduct.initAccordion();
       //console.log('new Product: ',thisProduct);
@@ -144,13 +145,33 @@
           /* deduct price of option from price */
             price = price - option.price;
           }
+          if (optionSelected) {
+            //let images = thisProduct.element.querySelectorAll('.'+paramId+'-'+optionId);//.classList.toggle(classNames.menuProduct.imageVisible);
+            //console.log(images)
+            //console.log(thisProduct.element.querySelector('.'+paramId+'-'+optionId))
+
+            //let images = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);
+            //console.log(images)
+            //test.classList.toggle(classNames.menuProduct.imageVisible)
+            //thisProduct.imageWrapper.classList.toggle(classNames.menuProduct.imageVisible);
+          } else {
+            //thisProduct.imageWrapper.classList.remove(classNames.menuProduct.imageVisible);
+          }
           /* END ELSE IF: if option is not selected and option is default */
         }
         /* END LOOP: for each optionId in param.options */
       }
       /* END LOOP: for each paramId in thisProduct.data.params */
       /* set the contents of thisProduct.priceElem to be the value of variable price */
+      price *= thisProduct.amountWidget.value;
       thisProduct.priceElem.innerHTML = price;
+    }
+    initAmountWidget() {
+      const thisProduct = this;
+      thisProduct.amountWidget = new amountWidget(thisProduct.amountWidgetElem);
+      thisProduct.amountWidgetElem.addEventListener('updated', function() {
+        thisProduct.processOrder();
+      });
     }
     getElements() {
       const thisProduct = this;
@@ -160,8 +181,69 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
+      thisProduct.amountWidgetElem = thisProduct.element.querySelector(select.menuProduct.amountWidget);
     }
   }
+  class amountWidget {
+    constructor(element) {//(input, linkDecrease, linkIncrease) {
+      const thisWidget = this;
+      thisWidget.getElements(element);
+      thisWidget.value=settings.amountWidget.defaultValue;
+      thisWidget.setValue(thisWidget.input.value);
+      thisWidget.initActions();
+
+      //console.log('AmountWidget: ',thisWidget);
+      //console.log('constructor arguments: ',element);
+      //console.log('constructor arguments: \n input: ',input,'\n linkDecrease: ',linkDecrease,'\n linkIncrease: ',linkIncrease);
+    }
+    getElements(element){
+      const thisWidget = this;
+
+      thisWidget.element = element;
+      thisWidget.input = thisWidget.element.querySelector(select.widgets.amount.input);
+      thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
+      thisWidget.linkIncrease = thisWidget.element.querySelector(select.widgets.amount.linkIncrease);
+    }
+    setValue(value) {
+      const thisWidget = this;
+
+      const NewValue = parseInt(value);
+
+      /*TODO: Add Validation */
+      if ((NewValue > (settings.amountWidget.defaultMin-1))&&(NewValue < (settings.amountWidget.defaultMax+1))) {
+        thisWidget.value = NewValue;
+      }
+      //thisWidget.value = NewValue;
+      thisWidget.announce();
+      thisWidget.input.value = thisWidget.value;
+    }
+    initActions() {
+      const thisWidget = this;
+      //console.log('thisWidget.input', thisWidget.input);
+      thisWidget.input.addEventListener('change', function() {
+        thisWidget.setValue(thisWidget.input);
+        //console.log('It changed.', thisWidget.input);
+      });
+      thisWidget.linkDecrease.addEventListener('click', function() {
+        event.preventDefault();
+        thisWidget.setValue(thisWidget.value-1);
+        //console.log('Decreased amount.');
+      });
+      thisWidget.linkIncrease.addEventListener('click', function() {
+        event.preventDefault();
+        thisWidget.setValue(thisWidget.value+1);
+        //console.log('Increased amount.');
+      });
+    }
+    announce() {
+      const thisWidget = this;
+
+      const event = new Event('updated');
+      thisWidget.element.dispatchEvent(event);
+    }
+  }
+
   const app = {
     initMenu: function() {
       const thisApp = this;
