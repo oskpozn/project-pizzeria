@@ -145,17 +145,25 @@
           /* deduct price of option from price */
             price = price - option.price;
           }
+          /* find images elements and save it to constans */
+          let images = thisProduct.imageWrapper.querySelectorAll('.'+paramId+'-'+optionId);
+          console.log(images)
+          /* if option is selected */
           if (optionSelected) {
-            //let images = thisProduct.element.querySelectorAll('.'+paramId+'-'+optionId);//.classList.toggle(classNames.menuProduct.imageVisible);
-            //console.log(images)
-            //console.log(thisProduct.element.querySelector('.'+paramId+'-'+optionId))
-
-            //let images = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);
-            //console.log(images)
-            //test.classList.toggle(classNames.menuProduct.imageVisible)
-            //thisProduct.imageWrapper.classList.toggle(classNames.menuProduct.imageVisible);
+            /* for let image in images */
+            for (let image of images) {
+              /* add class active to every find element */
+              image.classList.add('active');
+              //console.log('image in optionselected: ', image.getAttribute('class'))
+            }
+          /* end of if, start of else */
           } else {
-            //thisProduct.imageWrapper.classList.remove(classNames.menuProduct.imageVisible);
+            /* for every image found in images */
+            for (let image of images) {
+            /* remove class active */
+              image.classList.remove('active');
+              //console.log('image in !optionselected: ', image)
+            }
           }
           /* END ELSE IF: if option is not selected and option is default */
         }
