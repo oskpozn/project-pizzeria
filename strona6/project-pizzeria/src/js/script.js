@@ -329,11 +329,11 @@
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
       thisCart.dom.productList = {};//thisCart.dom.products.querySelector(select.cart.productList);
-      console.log('thiscarddomproductlist: ',thisCart)
+      //console.log('thiscarddomproductlist: ',thisCart);
       //console.log(classNames.cart.wrapperActive)
     }
     add(menuProduct) {
-      const thisCart = this;
+      //const thisCart = this;
       const generatedHTML = templates.cartProduct(menuProduct);//(thisCart.data)
       const generatedDOM = utils.createDOMFromHTML(generatedHTML);
       const cartContainer = document.querySelector(select.containerOf.cart);
