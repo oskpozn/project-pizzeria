@@ -151,12 +151,15 @@
       thisProduct.cartButton.addEventListener('click', function(event){
         event.preventDefault();
         thisProduct.processOrder();
+        thisProduct.addToCart();
       });
     }
     processOrder() {
       const thisProduct = this;
       /* read all data from the form (using utils.serializeFormToObject) and save it to const formData */
       const formData = utils.serializeFormToObject(thisProduct.form);
+      /* [NEW] Empty object to thisProduct.params */
+      thisProduct.params = {};
       /* set variable price to equal thisProduct.data.price */
       let price = thisProduct.data.price;
       /* START LOOP: for each paramId in thisProduct.data.params */
@@ -184,10 +187,17 @@
           //console.log(images)
           /* if option is selected */
           if (optionSelected) {
+            if (!thisProduct.params[paramId]){
+              thisProduct.params[paramId] = {
+                label: param.label,
+                options: { },
+              };
+            }
+            thisProduct.params[paramId].options[optionId] = option.label;
             /* for let image in images */
             for (let image of images) {
               /* add class active to every find element */
-              image.classList.add('active');
+              image.classList.add(classNames.menuProduct.imageVisible);
               //console.log('image in optionselected: ', image.getAttribute('class'))
             }
           /* end of if, start of else */
@@ -195,7 +205,7 @@
             /* for every image found in images */
             for (let image of images) {
             /* remove class active */
-              image.classList.remove('active');
+              image.classList.remove(classNames.menuProduct.imageVisible);
               //console.log('image in !optionselected: ', image)
             }
           }
@@ -205,8 +215,12 @@
       }
       /* END LOOP: for each paramId in thisProduct.data.params */
       /* set the contents of thisProduct.priceElem to be the value of variable price */
-      price *= thisProduct.amountWidget.value;
-      thisProduct.priceElem.innerHTML = price;
+      /* multiply price by amount */
+      thisProduct.priceSingle = price;
+      thisProduct.price = thisProduct.priceSingle * thisProduct.amountWidget.value;
+
+      /* set the contents of thisProduct.priceElem to be the value of variable price */
+      thisProduct.priceElem.innerHTML = thisProduct.price;
     }
     initAmountWidget() {
       const thisProduct = this;
@@ -225,6 +239,12 @@
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
       thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
       thisProduct.amountWidgetElem = thisProduct.element.querySelector(select.menuProduct.amountWidget);
+    }
+    addToCart() {
+      const thisProduct = this;
+      thisProduct.name = thisProduct.data.name;
+      thisProduct.amount = thisProduct.amountWidget.value;
+      app.cart.add(thisProduct);
     }
   }
   class amountWidget {
@@ -297,7 +317,7 @@
     }
     initActions() {
       const thisCart = this;
-      thisCart.dom.toggleTrigger.addEventListener('click', function() {
+      thisCart.dom.toggleTrigger.addEventListener('click', function(event) {
         event.preventDefault();
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
@@ -308,7 +328,18 @@
       thisCart.dom = {};
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
+      thisCart.dom.productList = {};//thisCart.dom.products.querySelector(select.cart.productList);
+      console.log('thiscarddomproductlist: ',thisCart)
       //console.log(classNames.cart.wrapperActive)
+    }
+    add(menuProduct) {
+      const thisCart = this;
+      const generatedHTML = templates.cartProduct(menuProduct);//(thisCart.data)
+      const generatedDOM = utils.createDOMFromHTML(generatedHTML);
+      const cartContainer = document.querySelector(select.containerOf.cart);
+      cartContainer.appendChild(generatedDOM);
+      //console.log('added product: ', generatedHTML);
+      console.log('adding product: ', menuProduct);
     }
   }
   const app = {
